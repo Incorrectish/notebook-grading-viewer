@@ -5,6 +5,9 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 import os
 
+# random hash for my name + "single" to ensure none of the gradescope downloaded
+# notebooks contains this string. You will see why this is important later :)
+UNIQUE_FILE_EXTENDER = '_single_cb39cf67e1fdf2d08a1e31fa30a555bdfe4d062c'
 
 """ We need to strip the cell of its leading "#"s or " "s because every cell
  begins with something like:
@@ -22,18 +25,6 @@ def remove_leading_hashes_and_spaces(text: str) -> str:
     while text and (text[0] == '#' or text[0] == ' '):
         text = text[1:].lstrip()
     return text
-
-# Open the .ipynb file
-
-
-# for inner_cells in cells_with_keyword:
-#     print(inner_cells[0].source)
-#     for i in range(1, len(inner_cells)):
-#         print("---------------------------------------------------")
-#         print(inner_cells[i].source)
-#     # print(cell)
-
-
 
 # Process the notebook content as needed
 
@@ -86,7 +77,7 @@ def main():
     nb['cells'] = cells_with_keyword[0]
 
     # Path to the new notebook file
-    notebook_path = notebook_base_name + '_single.ipynb'
+    notebook_path = notebook_base_name + '.ipynb'
 
     # Write the notebook to the file
     with open(notebook_path, 'w', encoding='utf-8') as f:
