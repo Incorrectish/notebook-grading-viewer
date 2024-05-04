@@ -32,14 +32,18 @@ run the following commands
 ```
 git clone https://github.com/Incorrectish/notebook-grading-viewer.git
 cd notebook-grading-viewer
-chmod +x install.sh"
+chmod +x install.sh
 ./install.sh
 ```
 
 # Installation instructions detailed
-In case my install script doesn't work, here is what you need to do. In this
-directory, you need to create a virtual environment called ".venv". 
+In case my install script doesn't work, here is what you need to do. In the
+notebook-grading-viewer directory, you need to create a virtual environment called ".venv". 
 
+```
+git clone https://github.com/Incorrectish/notebook-grading-viewer.git
+cd notebook-grading-viewer
+```
 
 ```python3 -m venv.venv```
 
