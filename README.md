@@ -29,7 +29,9 @@ the directory this script is in
 A prerequisite to both of these is that you have both git and python3 installed.
 
 git clone https://github.com/Incorrectish/notebook-grading-viewer.git
+
 run "chmod +x install.sh"
+
 run "./install.sh"
 
 # Installation instructions detailed
