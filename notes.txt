@@ -1,2 +1,0 @@
-1. You have to "source .venv/bin/activate" or "source .venv/bin/activate.fish"
-

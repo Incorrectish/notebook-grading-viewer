@@ -1,4 +1,3 @@
-import nbformat
 import sys
 from PyQt5.QtCore import QUrl
 from PyQt5.QtWidgets import QApplication
@@ -34,7 +33,11 @@ def remove_leading_hashes_and_spaces(text: str) -> str:
         text = text[1:].lstrip()
     return text
 
-def read_notebook_with_retries(filepath, max_attempts=5, retry_delay=1):
+# When you download a file, it takes time to fully write the contents of the
+# file, and the file will appear empty until it has finished downloading. So we
+# just keep trying to read the file until it has finished downloading. We cap
+# the max attempts in order to ensure that we don't loop forever
+def read_notebook_with_retries(filepath, max_attempts=25, retry_delay=1):
     """Attempt to read a Jupyter notebook file with retries on failure."""
     attempts = 0
     while attempts < max_attempts:
@@ -48,27 +51,11 @@ def read_notebook_with_retries(filepath, max_attempts=5, retry_delay=1):
     raise Exception(f"Failed to read notebook after {max_attempts} attempts.")
 
 
-# Process the notebook content as needed
-
-
-# To find eg 3.1, we look for either a cell that starts with 3.1 or we look for
-# if we have passed section 3 BUT NOT section 4 and then look for part 1
-
-
-# thoughts: first run setup, where you can specify the problem then the
-# directory. Specify also how many followup cells you need
-
-# collect our cells: write them to a notebook. Convert that notebook to HTML.
-# Display the HTML notebook. Save the state of the directory into a list. Once
-# that directory has a new file added, remove the files created and repeat with
-# the new one
-
-
+# We read the notebook, search for the specified question(the argument keyword
+# is misleading, it should be "question"), and get the cell that contains the
+# question along with the next <followup_cells> cells. We write that to a new
+# notebook, convert that notebook to HTML, then put it in our rendering queue
 def process_notebook(student_notebook_path, html_queue, keyword, followup_cells):
-    # time.sleep(wait_time)  # wait before reading the file. The reason for this is
-    # because the file is often not fully downloaded if you try to read it
-    # immediately and you will get an error. TODO make this an option in command
-    # line arguments if your internet is bad
     notebook_base_name, _ = os.path.splitext(student_notebook_path)
     notebook = read_notebook_with_retries(student_notebook_path)
 
@@ -127,6 +114,7 @@ def process_notebook(student_notebook_path, html_queue, keyword, followup_cells)
     html_full_path = os.path.join(os.getcwd(), single_html_path)
     html_queue.put(html_full_path)
 
+# Basic class for our HTML renderer
 class BrowserWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -137,6 +125,9 @@ class BrowserWindow(QMainWindow):
     def load_url(self, url):
         self.browser.setUrl(QUrl(url))
 
+# Create our HTML renderer and then run our event handlerer. We check the
+# directory to see if any new ".ipynb" files appear. If they do run the process
+# function and add them to our rendering queue to render. 
 def main(keyword: str, followup_cells: int, path):
     app = QApplication(sys.argv)
     window = BrowserWindow()
@@ -165,6 +156,9 @@ class MyHandler(FileSystemEventHandler):
         self.html_queue = html_queue
         self.followup_cells = followup_cells
 
+    # we only want to process new downloaded notebooks, not the intermediary
+    # notebooks that this program creates, so I added the uniuqe file extender
+    # to identify the intermediary files we create and not trigger on them
     def process(self, event):
         if event.src_path.endswith('.ipynb') and not (UNIQUE_FILE_EXTENDER in event.src_path):
             print(f"Detected new notebook: {event.src_path}")
