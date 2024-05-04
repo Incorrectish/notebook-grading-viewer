@@ -1,0 +1,13 @@
+{
+  "pythonVersion": "3.12.2", 
+  "venvPath": "/Users/ishan/UMD/Teaching_Assistant/320/notebook_displayer/",
+  "venv": ".venv",
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    ".venv"
+  ]
+}
