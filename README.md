@@ -57,3 +57,10 @@ Then you need to install the following dependencies:
 .venv/bin/pip3 install PyQT5
 ```
 
+# Known things to not do 
+Don't download the same file twice into the tracked directory. This causes a
+crash. I could spend time debugging this, but this is an easy thing for you guys
+to not do :)
+
+By this I mean you shouldn't have a directory that's being tracked that has a
+file like: "123.ipynb", and then you download "123(1).ipynb"
