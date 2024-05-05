@@ -50,29 +50,22 @@ def read_notebook_with_retries(filepath, max_attempts=25, retry_delay=1):
             attempts += 1
     raise Exception(f"Failed to read notebook after {max_attempts} attempts.")
 
-
-# We read the notebook, search for the specified question(the argument keyword
-# is misleading, it should be "question"), and get the cell that contains the
-# question along with the next <followup_cells> cells. We write that to a new
-# notebook, convert that notebook to HTML, then put it in our rendering queue
-def process_notebook(student_notebook_path, html_queue, keyword, followup_cells):
-    notebook_base_name, _ = os.path.splitext(student_notebook_path)
-    notebook = read_notebook_with_retries(student_notebook_path)
-
-    cells = notebook['cells']
-
-    # if i split "1" by ".", I get ["1"]
-    parts = keyword.strip().split('.')
+# Search engine for question. Given question finds the cells corressponding to
+# the question and the next followup_cells cells. This is the function that
+# probably should be adapted in case you want to generalize this program to work
+# with more than just CMSC320 homework 5 :)
+def search(cells, question, followup_cells):
+    parts = question.strip().split('.')
+    # numbers are weird, like 1.2 is actually 2.2 for some reason, so I'll just
+    # increment section when searching
     section_number = int(parts[0].strip()) - 1
     print(section_number)
     if len(parts) == 1:
         part = None
     else:
         part = parts[1]
-    # numbers are weird, like 1.2 is actually 2.2 for some reason, so I'll just
-    # increment section when searching
 
-    cells_with_keyword = []
+    cells_with_keyword = None
 
     if part != None:
         for i, cell in enumerate(cells):
@@ -83,27 +76,41 @@ def process_notebook(student_notebook_path, html_queue, keyword, followup_cells)
                 # we are assuming there is a output cell after this, we could do error
                 # checking here instead, but not yet
                 # text cell, code cell, output cell
-                cells_with_keyword.append(cells[i:i+followup_cells+1])
+                cells_with_keyword = cells[i:i+followup_cells+1]
                 break
 
-    if len(cells_with_keyword) == 0:
+    if cells_with_keyword == None:
         section= False 
         for i, cell in enumerate(cells):
             stripped_leading_source = remove_leading_hashes_and_spaces(cell.source)
             if stripped_leading_source.startswith(f"Section {section_number}"):
                 section = True
             elif section_number == 4 and stripped_leading_source.startswith("Final Section"):
-                cells_with_keyword.append(cells[i:i+followup_cells+1])
+                cells_with_keyword = cells[i:i+followup_cells+1]
                 break
             elif section_number == 5 and stripped_leading_source.startswith("Bonus Question"):
-                cells_with_keyword.append(cells[i:i+followup_cells+1])
+                cells_with_keyword = cells[i:i+followup_cells+1]
                 break
             elif stripped_leading_source.startswith(f"Part {part}") and section:
-                cells_with_keyword.append(cells[i:i+followup_cells+1])
+                cells_with_keyword = cells[i:i+followup_cells+1]
                 break
+    return cells_with_keyword
+
+# We read the notebook, search for the specified question, and get the cell that contains the
+# question along with the next <followup_cells> cells. We write that to a new
+# notebook, convert that notebook to HTML, then put it in our rendering queue
+def process_notebook(student_notebook_path, html_queue, question, followup_cells):
+    notebook_base_name, _ = os.path.splitext(student_notebook_path)
+    notebook = read_notebook_with_retries(student_notebook_path)
+
+    cells = notebook['cells']
+
+    # if i split "1" by ".", I get ["1"]
+
+    cells_with_keyword = search(cells, question, followup_cells)
 
     nb = notebook
-    nb['cells'] = cells_with_keyword[0]
+    nb['cells'] = cells_with_keyword
     single_notebook_path = notebook_base_name + UNIQUE_FILE_EXTENDER + '.ipynb'
     with open(single_notebook_path, 'w', encoding='utf-8') as f:
         nbformat.write(nb, f)
