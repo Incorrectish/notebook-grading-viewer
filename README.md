@@ -52,7 +52,7 @@ Then you need to install the following dependencies:
 ```
 .venv/bin/pip3 install jupyter 
 .venv/bin/pip3 install nbconvert
-.venv/bin/pip3 install watchdop 
+.venv/bin/pip3 install watchdog 
 .venv/bin/pip3 install PyQTWebEngine
 .venv/bin/pip3 install PyQT5
 ```
