@@ -64,3 +64,9 @@ to not do :)
 
 By this I mean you shouldn't have a directory that's being tracked that has a
 file like: "123.ipynb", and then you download "123(1).ipynb"
+
+This might become a problem if you want to grade a second problem and redownload. For this I reccomend purging the directory of all the ".ipynb"s and ".htmls" by running(IN THAT DIRECTORY ONLY)
+```
+rm *.ipynb
+rm *.html
+```
