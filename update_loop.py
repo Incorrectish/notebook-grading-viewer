@@ -163,12 +163,14 @@ class MyHandler(FileSystemEventHandler):
         self.keyword = keyword
         self.html_queue = html_queue
         self.followup_cells = followup_cells
+        print()
 
     # we only want to process new downloaded notebooks, not the intermediary
     # notebooks that this program creates, so I added the uniuqe file extender
     # to identify the intermediary files we create and not trigger on them
     def process(self, event):
-        if event.src_path.endswith('.ipynb') and not (UNIQUE_FILE_EXTENDER in event.src_path):
+        # if event.src_path.endswith('.ipynb') and not (UNIQUE_FILE_EXTENDER in event.src_path):
+        if not (UNIQUE_FILE_EXTENDER in event.src_path):
             print(f"Detected new notebook: {event.src_path}")
             process_notebook(event.src_path, self.html_queue, self.keyword,
                              self.followup_cells)
