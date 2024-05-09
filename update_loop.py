@@ -148,11 +148,11 @@ def main(keyword: str, followup_cells: int, path):
 
     try:
         while True:
-            print("initial path" + path)
+            print(os.listdir(path))
             if not html_queue.empty():
                 url = html_queue.get()
                 window.load_url(f"file:///{url}")
-                print("path after loading url " + path)
+                print(os.listdir(path))
             app.processEvents()
     except KeyboardInterrupt:
         observer.stop()
