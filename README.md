@@ -70,3 +70,8 @@ This might become a problem if you want to grade a second problem and redownload
 rm *.ipynb
 rm *.html
 ```
+
+# Known Problems
+This script will not work if you download files through Safari. It has only been
+tested on firefox and chrome. Safari has this weird problem where it downloads
+files into a special different directory. Do not use safari!! 

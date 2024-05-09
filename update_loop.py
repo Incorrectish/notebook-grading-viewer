@@ -100,7 +100,6 @@ def search(cells, question, followup_cells):
 # question along with the next <followup_cells> cells. We write that to a new
 # notebook, convert that notebook to HTML, then put it in our rendering queue
 def process_notebook(student_notebook_path, html_queue, question, followup_cells):
-    print("processing notebook")
     notebook_base_name, _ = os.path.splitext(student_notebook_path)
     notebook = read_notebook_with_retries(student_notebook_path)
 
@@ -144,7 +143,7 @@ def main(keyword: str, followup_cells: int, path):
 
     event_handler = MyHandler(html_queue, keyword, followup_cells)
     observer = Observer()
-    observer.schedule(event_handler, path, recursive=True)
+    observer.schedule(event_handler, path, recursive=False)
     observer.start()
 
     try:
@@ -175,12 +174,12 @@ class MyHandler(FileSystemEventHandler):
             process_notebook(event.src_path, self.html_queue, self.keyword,
                              self.followup_cells)
 
-    def on_any_event(self, event):
-        print(f"Event type: {event.event_type} path: {event.src_path}")
-        # if event.is_directory:
-        #     return
-        # if event.event_type == 'created' and event.src_path.endswith('.ipynb'):
-        #     self.process(event)
+    # def on_(self, event):
+    #     print(f"Event type: {event.event_type} path: {event.src_path}")
+    #     # if event.is_directory:
+    #     #     return
+    #     # if event.event_type == 'created' and event.src_path.endswith('.ipynb'):
+    #     #     self.process(event)
 
     def on_created(self, event):
         print(f"notebook created {event}")
