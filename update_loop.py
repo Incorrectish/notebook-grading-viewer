@@ -100,6 +100,7 @@ def search(cells, question, followup_cells):
 # question along with the next <followup_cells> cells. We write that to a new
 # notebook, convert that notebook to HTML, then put it in our rendering queue
 def process_notebook(student_notebook_path, html_queue, question, followup_cells):
+    print("processing notebook")
     notebook_base_name, _ = os.path.splitext(student_notebook_path)
     notebook = read_notebook_with_retries(student_notebook_path)
 
@@ -148,11 +149,9 @@ def main(keyword: str, followup_cells: int, path):
 
     try:
         while True:
-            print(os.listdir(path))
             if not html_queue.empty():
                 url = html_queue.get()
                 window.load_url(f"file:///{url}")
-                print(os.listdir(path))
             app.processEvents()
     except KeyboardInterrupt:
         observer.stop()
@@ -175,6 +174,7 @@ class MyHandler(FileSystemEventHandler):
                              self.followup_cells)
 
     def on_created(self, event):
+        print(f"notebook created {event}")
         self.process(event)
 
 if __name__ == "__main__":
