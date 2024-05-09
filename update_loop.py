@@ -144,7 +144,7 @@ def main(keyword: str, followup_cells: int, path):
 
     event_handler = MyHandler(html_queue, keyword, followup_cells)
     observer = Observer()
-    observer.schedule(event_handler, path, recursive=False)
+    observer.schedule(event_handler, path, recursive=True)
     observer.start()
 
     try:
@@ -170,10 +170,17 @@ class MyHandler(FileSystemEventHandler):
     # to identify the intermediary files we create and not trigger on them
     def process(self, event):
         # if event.src_path.endswith('.ipynb') and not (UNIQUE_FILE_EXTENDER in event.src_path):
-        if not (UNIQUE_FILE_EXTENDER in event.src_path):
+        if event.src_path.endswith('.ipynb') and not (UNIQUE_FILE_EXTENDER in event.src_path):
             print(f"Detected new notebook: {event.src_path}")
             process_notebook(event.src_path, self.html_queue, self.keyword,
                              self.followup_cells)
+
+    def on_any_event(self, event):
+        print(f"Event type: {event.event_type} path: {event.src_path}")
+        # if event.is_directory:
+        #     return
+        # if event.event_type == 'created' and event.src_path.endswith('.ipynb'):
+        #     self.process(event)
 
     def on_created(self, event):
         print(f"notebook created {event}")
